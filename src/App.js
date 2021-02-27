@@ -39,24 +39,24 @@ function App() {
 
   useEffect(() => {
     // Backend
-    auth.onAuthStateChanged((authUser) => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
-        console.log(authUser)
         setUser(authUser);
 
         if (authUser.displayName) {
-          
         } else {
           return authUser.updateProfile({
-            displayName: username
-          })
+            displayName: username,
+          });
         }
-
-
       } else {
         setUser(null);
       }
     });
+
+    return () => {
+      unsubscribe();
+    };
   }, [user, username]);
 
   useEffect(() => {
@@ -76,6 +76,11 @@ function App() {
 
     auth
       .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        return authUser.user.updateProfile({
+          displayName: username
+        })
+      })
       .catch((err) => alert(err.message));
   };
 
