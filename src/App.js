@@ -1,8 +1,8 @@
-import { Button, Input, Modal } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { Post } from "./components/Post";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
+import { Button, Input, Modal } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { Post } from "./components/Post";
 
 function getModalStyle() {
   const top = 50;
@@ -35,6 +35,29 @@ function App() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Backend
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        console.log(authUser)
+        setUser(authUser);
+
+        if (authUser.displayName) {
+          
+        } else {
+          return authUser.updateProfile({
+            displayName: username
+          })
+        }
+
+
+      } else {
+        setUser(null);
+      }
+    });
+  }, [user, username]);
 
   useEffect(() => {
     db.collection("posts").onSnapshot((snapshot) => {
@@ -48,14 +71,20 @@ function App() {
     });
   }, []);
 
-  const handleLogin = (e) => {};
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .catch((err) => alert(err.message));
+  };
 
   return (
     <div className="app">
       {/* MODAL */}
       <Modal open={open} onClose={() => setOpen(false)}>
         <div style={modalStyle} className={classes.paper}>
-          <form>
+          <form className="app__singUp">
             <center>
               <img
                 className="app__headerImage"
@@ -66,12 +95,14 @@ function App() {
             <Input
               placeholder="username"
               type="text"
+              autoComplete="off"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
             <Input
               placeholder="emali"
               type="text"
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
