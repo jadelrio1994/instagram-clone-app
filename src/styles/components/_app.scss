@@ -4,6 +4,9 @@
 }
 
 .app__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background-color: white;
   padding: 20px;
   border-bottom: 1px solid lightgrey;
@@ -24,4 +27,10 @@
 
 .app__logoutContainer {
   display: flex;
+}
+
+.app__posts {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
 }
