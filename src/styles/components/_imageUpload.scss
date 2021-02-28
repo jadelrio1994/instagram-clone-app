@@ -1,0 +1,18 @@
+.imageUpload__container {
+  position: fixed;
+  bottom: 0;
+  background-color: azure;
+  width: 100%;
+
+}
+
+.imageUpload {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  margin: 10px auto;
+
+  progress {
+    width: 100%;
+  }
+}

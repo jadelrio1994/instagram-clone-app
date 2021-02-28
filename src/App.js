@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "./firebase";
-import { Button, Input, Modal } from "@material-ui/core";
+import { Avatar, Button, Input, Modal } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Post } from "./components/Post";
+import { ImageUpload } from "./components/ImageUpload";
 
 function getModalStyle() {
   const top = 50;
@@ -32,6 +33,7 @@ function App() {
 
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openSingIn, setOpenSingIn] = useState(false);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -42,13 +44,6 @@ function App() {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         setUser(authUser);
-
-        if (authUser.displayName) {
-        } else {
-          return authUser.updateProfile({
-            displayName: username,
-          });
-        }
       } else {
         setUser(null);
       }
@@ -71,17 +66,35 @@ function App() {
     });
   }, []);
 
-  const handleLogin = (e) => {
+  const reset = () => {
+    setEmail("");
+    setPassword("");
+  };
+
+  const singUp = (e) => {
     e.preventDefault();
 
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((authUser) => {
         return authUser.user.updateProfile({
-          displayName: username
-        })
+          displayName: username,
+        });
       })
       .catch((err) => alert(err.message));
+
+    setOpen(false);
+    reset();
+  };
+
+  const singIn = (e) => {
+    e.preventDefault();
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .catch((err) => alert(err.message));
+
+    setOpenSingIn(false);
+    reset();
   };
 
   return (
@@ -118,7 +131,39 @@ function App() {
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <Button onClick={handleLogin}>Login</Button>
+            <Button type="submit" onClick={singUp}>
+              Sing Up
+            </Button>
+          </form>
+        </div>
+      </Modal>
+      <Modal open={openSingIn} onClose={() => setOpenSingIn(false)}>
+        <div style={modalStyle} className={classes.paper}>
+          <form className="app__singUp">
+            <center>
+              <img
+                className="app__headerImage"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/640px-Instagram_logo.svg.png"
+                alt="Logo"
+              />
+            </center>
+            <Input
+              placeholder="emali"
+              type="text"
+              autoComplete="off"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <Button type="submit" onClick={singIn}>
+              Sing In
+            </Button>
           </form>
         </div>
       </Modal>
@@ -132,7 +177,21 @@ function App() {
           alt="Logo"
         />
 
-        <Button onClick={() => setOpen(true)}>Sing up</Button>
+        {user ? (
+          <div className="app__logoutContainer">
+            <Button onClick={() => auth.signOut()}>Logout</Button>
+            <Avatar
+              className="post__avatar"
+              alt={user?.displayName}
+              src="/static/images/avatar/1.jpg"
+            />
+          </div>
+        ) : (
+          <div className="app__loginContainer">
+            <Button onClick={() => setOpenSingIn(true)}>Sing in</Button>
+            <Button onClick={() => setOpen(true)}>Sing up</Button>
+          </div>
+        )}
       </div>
 
       <h1>Instagram clone app it's beging</h1>
@@ -145,6 +204,12 @@ function App() {
           imageUrl={posts.imageUrl}
         />
       ))}
+
+      {user?.displayName ? (
+        <ImageUpload username={user.displayName} />
+      ) : (
+        <h3>Sorry you need to login to upload</h3>
+      )}
     </div>
   );
 }
