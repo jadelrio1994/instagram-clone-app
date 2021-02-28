@@ -4,7 +4,7 @@ import { Avatar, Button, Input, Modal } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Post } from "./components/Post";
 import { ImageUpload } from "./components/ImageUpload";
-import InstagramEmbed from "react-instagram-embed";
+// import InstagramEmbed from 'react-instagram-embed';
 
 function getModalStyle() {
   const top = 50;
@@ -56,17 +56,15 @@ function App() {
   }, [user, username]);
 
   useEffect(() => {
-    db.collection("posts")
-      .orderBy("timestamp", "desc")
-      .onSnapshot((snapshot) => {
-        // cada vez q se agrege un post este codigo se dispara
-        setPosts(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            posts: doc.data(),
-          }))
-        );
-      });
+    db.collection("posts").orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+      // cada vez q se agrege un post este codigo se dispara
+      setPosts(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          posts: doc.data(),
+        }))
+      );
+    });
   }, []);
 
   const reset = () => {
@@ -210,21 +208,21 @@ function App() {
             />
           ))}
         </div>
-        <div className="app__postsRight">
-          <InstagramEmbed
-            url="https://www.instagram.com/p/B_uf9dmAGPw/"
-            clientAccessToken="123|456"
-            maxWidth={320}
-            hideCaption={false}
-            containerTagName="div"
-            protocol=""
-            injectScript
-            onLoading={() => {}}
-            onSuccess={() => {}}
-            onAfterRender={() => {}}
-            onFailure={() => {}}
-          />
-        </div>
+            {/* <div className="app__postsRight">
+              <InstagramEmbed
+                url="https://www.instagram.com/p/B_uf9dmAGPw/"
+                clientAccessToken="123|456"
+                maxWidth={320}
+                hideCaption={false}
+                containerTagName="div"
+                protocol=""
+                injectScript
+                onLoading={() => {}}
+                onSuccess={() => {}}
+                onAfterRender={() => {}}
+                onFailure={() => {}}
+              />
+            </div> */}
       </div>
 
       {user?.displayName ? (

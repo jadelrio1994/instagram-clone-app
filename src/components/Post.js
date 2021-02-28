@@ -16,7 +16,7 @@ export const Post = ({ postId, user, username, caption, imageUrl }) => {
         .collection("comments")
         .orderBy('timestamp', 'desc')
         .onSnapshot((snaptshot) => {
-          setComments(snaptshot.docs.map((doc) => doc.data()));
+          setComments(snaptshot.docs.map((doc) => ({id:doc.id, comment:doc.data()})));
         });
     }
     return () => {
@@ -56,9 +56,9 @@ export const Post = ({ postId, user, username, caption, imageUrl }) => {
       {/* username + caption */}
 
       <div className="post__comments">
-        {comments.map((comment) => (
-          <p>
-            <strong>{comment.username}</strong> {comment.text}
+        {comments.map(({id, comment}) => (
+          <p key={id} >
+            <strong>{comment.username}:</strong> {comment.text}
           </p>
         ))}
       </div>
